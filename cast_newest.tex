@@ -1,0 +1,162 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath, amssymb, graphicx}
+\usepackage{listings, xcolor, booktabs, hyperref}
+\usepackage{algorithm, algpseudocode}
+
+% --- LaTeX Preamble for Code Listings ---
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.97,0.97,0.97}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2,
+    language=Python
+}
+\lstset{style=mystyle}
+
+\title{\textbf{STAMPEDE: A Modular Framework for Adaptive Spatio-Temporal Representation Learning on Continuous-Time Dynamic Graphs}}
+\author{Your Name(s)}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Continuous-Time Dynamic Spatio-Temporal Graphs (CTDSTGs) present a significant challenge for conventional Graph Neural Networks (GNNs), primarily due to the difficulty of effectively and interpretably fusing information from distinct spatial and temporal domains. Traditional learning methods often fail to capture the intrinsic geometric relationships that govern the interaction between evolving temporal patterns and structural graph topology.
+
+This proposal introduces a novel framework named \textbf{STAMPEDE}, which stands for \textit{Spatio-Temporal Adaptable Multi-modal Positional Embedding and Dynamic Evolution}. STAMPEDE is a modular and extensible system designed to decouple spatio-temporal feature engineering from the core message-passing computations of Graph Neural Networks. It integrates state-of-the-art, learnable encoding mechanisms for both spatial and temporal components and introduces a principled fusion mechanism based on Clifford Algebra, also known as Geometric Algebra.
+
+Two variants of the fusion mechanism are proposed: (1) \textbf{Core Clifford Spatiotemporal Fusion (C-CASF)}, which uses a fixed orthogonal geometric metric, and (2) \textbf{Context-Adaptive Geometric Algebra (CAGA)}, which learns a dynamic, event-specific geometric interaction metric. This document provides a detailed technical blueprint for the architecture, implementation, and evaluation of the STAMPEDE framework.
+\end{abstract}
+
+\section{Introduction and Motivation}
+Graph Neural Networks are widely recognized for their effectiveness in learning representations from relational and topological data. However, when applied to Continuous-Time Dynamic Spatio-Temporal Graphs, in which interactions occur asynchronously and nodes evolve over time, Graph Neural Networks face unique challenges.
+
+The key difficulty lies in representing and fusing spatial context (that is, structural information about a node’s position within the graph) with temporal context (that is, the precise timestamp of the event being processed). Naive methods such as concatenation or multi-layer perceptrons treat these two feature spaces as unstructured vectors, ignoring the geometry of the underlying spacetime.
+
+We hypothesize that leveraging a geometrically-aware fusion strategy can lead to better representations and improve both performance and interpretability. Clifford Algebra, a unified mathematical formalism for encoding geometric relationships, is well-suited for this task and is at the heart of our proposed fusion strategy.
+
+\section{Framework Architecture: Separation of Functional Roles}
+The STAMPEDE framework is designed around the principle of \textbf{Separation of Concerns}. It consists of two clearly defined and modular components:
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=0.9\textwidth]{placeholder.png}
+    \caption{Overall architecture of the STAMPEDE framework. The feature processing pipeline is isolated from the Graph Neural Network's message-passing module, enabling modular integration.}
+    \label{fig:architecture}
+\end{figure}
+
+\subsection{Component 1: Feature Processing Module}
+The feature processing pipeline is encapsulated in a class called \texttt{STAMPEDE\_Feature\_Processor}. It operates independently of the Graph Neural Network and is responsible for generating enriched input embeddings for each node-event pair. The processing consists of three sequential stages:
+
+\begin{enumerate}
+    \item \textbf{Dynamic Spatial Encoding ($\mathbf{e}_{\text{spatial}}$)}: A spatial encoder (typically a Graph Neural Network based on R-PEARL or Graph Isomorphism Network) is applied on a time-aware subgraph sampled around the target node at the specified timestamp. This produces a context-aware embedding representing the node’s recent spatial configuration.
+
+    \item \textbf{Temporal Encoding ($\mathbf{e}_{\text{temporal}}$)}: A learnable time encoding mechanism (e.g., LeTE or Time2Vec) transforms the timestamp into a temporal embedding that captures various time scales and patterns.
+
+    \item \textbf{Spatio-Temporal Fusion ($\mathbf{e}_{\text{fused}}$)}: The two embeddings are fused into a single representation using a dedicated fusion layer, which may be implemented using Clifford Algebra (either C-CASF or CAGA) or alternative strategies.
+\end{enumerate}
+
+The final embedding is a configurable concatenation or projection of the spatial, temporal, and fused embeddings.
+
+\subsection{Component 2: Graph Neural Network Backbone}
+This component refers to the core message-passing model. It can be instantiated using any continuous-time dynamic Graph Neural Network, such as:
+
+\begin{itemize}
+    \item Temporal Graph Attention Network (TGAT)
+    \item DyGMamba
+    \item Time-Embedded Graph Network (TGN)
+    \item DyRep
+    \item CAWN, JODIE, GraphMixer, DyGFormer, etc.
+\end{itemize}
+
+Each model is minimally modified to accept injected initial node features from the STAMPEDE processor instead of relying on raw input features.
+
+\section{Implementation of Core Modules}
+
+\subsection{Dynamic Spatial Encoder: \texttt{spatial\_encoder.py}}
+This module builds dynamic spatial representations using subgraph sampling and Graph Neural Network computation.
+
+\begin{algorithmic}[1]
+\Function{forward}{node\_identifiers, timestamps, neighbor\_sampler}
+    \State Initialize empty list \texttt{subgraph\_list}
+    \ForAll{node $u$, time $t$ in batch}
+        \State Sample temporal subgraph using \texttt{neighbor\_sampler}
+        \State Convert the subgraph into a PyTorch Geometric \texttt{Data} object
+        \State Append to \texttt{subgraph\_list}
+    \EndFor
+    \State Batch all subgraphs into a single input
+    \State Run the Graph Neural Network encoder
+    \State Extract and return root node embeddings
+\EndFunction
+\end{algorithmic}
+
+\subsection{Fusion Mechanisms: \texttt{fusion\_layer.py}}
+
+\subsubsection*{Clifford-Based Spatiotemporal Fusion (C-CASF)}
+This method assumes a fixed orthogonal relationship between spatial and temporal dimensions. The embeddings are fused via the geometric outer product (wedge product $\wedge$), implemented efficiently as:
+
+\begin{equation}
+\mathbf{B}_{\text{bivector}} = \texttt{torch.bmm}(\mathbf{e}_{\text{spatial}}.\texttt{unsqueeze}(2), \mathbf{e}_{\text{temporal}}.\texttt{unsqueeze}(1))
+\end{equation}
+
+\subsubsection*{Context-Adaptive Geometric Algebra Fusion (CAGA)}
+This method dynamically learns a custom interaction metric for each event. It consists of:
+
+\begin{enumerate}
+    \item A Metric Parameterization Network (a small multilayer perceptron) learns an inner product matrix $\mathbf{G}_{\text{spatio-temporal}}$ based on the concatenated spatial and temporal embeddings.
+    \item A scalar part is computed via:
+
+    \[
+    \text{scalar} = \sum_{i,j} e^{(i)}_{\text{spatial}} \cdot G^{(i,j)}_{\text{spatio-temporal}} \cdot e^{(j)}_{\text{temporal}}
+    \]
+
+    \item The bivector part is calculated as in the Core Clifford Spatiotemporal Fusion method.
+    \item The scalar and bivector parts are concatenated to form a multivector representation, then linearly projected to the final dimension.
+\end{enumerate}
+
+\section{Modularity and Encoder Alternatives}
+
+\subsection{Alternative Structural Encoders for Spatial Context}
+\begin{itemize}
+    \item \textbf{Graph Transformer Positional Encodings}: Utilize eigenvectors and eigenvalues of the graph Laplacian matrix as attention keys.
+    \item \textbf{Node2Vec and DeepWalk}: Shallow random walk-based embeddings that encode structural similarity.
+    \item \textbf{Motif-based Encoders (e.g., Graph Substructure Networks)}: Encode higher-order motifs such as triangles and cliques for richer local structure.
+\end{itemize}
+
+\subsection{Alternative Temporal Encoders}
+\begin{itemize}
+    \item \textbf{Time2Vec}: Combines linear projection and periodic functions to capture multiple time scales.
+    \item \textbf{PINT (Path-based Interpolation of Temporal Dynamics)}: Encodes temporal-topological distance through time-respecting random walks.
+    \item \textbf{Hawkes Process-based Embeddings}: Learn temporal intensity functions that reflect self-excitation and mutual excitation in event streams.
+\end{itemize}
+
+\section{Conclusion and Future Work}
+STAMPEDE is a robust and modular framework designed to bridge the gap between temporal modeling and geometric reasoning in continuous-time dynamic graphs. By cleanly separating feature generation from message passing, and introducing a principled fusion layer grounded in Clifford Algebra, it provides a strong foundation for future experimentation.
+
+Immediate next steps include:
+
+\begin{itemize}
+    \item Performing empirical evaluations of the proposed fusion methods (C-CASF and CAGA).
+    \item Benchmarking against standard models using public datasets.
+    \item Exploring further generalizations of the fusion mechanism (e.g., k-blade interactions, learnable basis vectors).
+\end{itemize}
+
+\end{document}
