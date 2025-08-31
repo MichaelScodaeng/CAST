@@ -1,0 +1,56 @@
+defaults:
+  - schema
+  - _self_
+
+base_model: gine
+gine_model_bn: False
+pe_method: pearl
+n_node_types: 28  
+n_edge_types: 3
+node_emb_dims: 128
+pooling: add
+
+sample_aggr_model_name: gin
+pe_dims: 37   # based on SPE paper by Huang et al. (2023)
+n_sample_aggr_layers: 8
+sample_aggr_hidden_dims: 40
+
+n_base_layers: 4
+base_hidden_dims: 128
+
+n_mlp_layers: 3
+mlp_hidden_dims: 105
+mlp_use_bn: true
+mlp_use_ln: false
+mlp_activation: relu
+mlp_dropout_prob: 0.0
+pe_aggregate: add
+
+residual: true
+graph_norm: false 
+batch_norm: True  
+
+use_subset: True
+train_batch_size: 128
+val_batch_size: 128
+
+basis: false 
+num_samples: 120
+pearl_k: 1
+pearl_mlp_nlayers: 1
+pearl_mlp_hid: 37   
+pearl_mlp_out: 37
+pearl_act: relu
+
+lr: 1e-3
+weight_decay: 3e-6
+momentum: 0.9
+nesterov: false
+
+n_warmup_steps: 100
+target_dim: 1
+
+n_epochs: 1400
+out_dirpath: out/baseline
+wandb: True
+wandb_run_name: random_k=1

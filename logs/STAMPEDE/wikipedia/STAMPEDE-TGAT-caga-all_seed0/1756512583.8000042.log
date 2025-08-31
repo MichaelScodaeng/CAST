@@ -1,0 +1,88 @@
+2025-08-30 09:09:43,801 - root - INFO - ********** Run 1 starts. **********
+2025-08-30 09:09:43,802 - root - INFO - Configuration is Namespace(dataset_name='wikipedia', batch_size=200, model_name='STAMPEDE', gpu=0, num_neighbors=20, sample_neighbor_strategy='recent', time_scaling_factor=1e-06, num_walk_heads=8, num_heads=2, num_layers=2, walk_length=1, time_gap=2000, time_feat_dim=100, position_feat_dim=172, time_window_mode='fixed_proportion', patch_size=1, channel_embedding_dim=50, max_input_sequence_length=32, learning_rate=0.0001, dropout=0.1, gamma=0.5, num_epochs=5, optimizer='Adam', weight_decay=0.0, patience=20, val_ratio=0.15, test_ratio=0.15, num_runs=1, test_interval_epochs=1, negative_sample_strategy='random', max_interaction_times=10, load_best_configs=False, fusion_method='caga', embedding_type='all', spatial_dim=64, temporal_dim=64, output_dim=172, backbone='TGAT', device='cuda:0', seed=0, save_model_name='STAMPEDE-TGAT-caga-all_seed0')
+2025-08-30 09:09:44,382 - root - INFO - Instantiating model: TGAT
+2025-08-30 09:09:44,442 - root - INFO - model -> Sequential(
+  (0): TGAT(
+    (feature_preprocessor): STAMPEDE_Feature_Processor(
+      (spatial_encoder): DynamicSpatialEncoder(
+        (gnn): GIN(
+          (layers): ModuleList(
+            (0-1): 2 x GINLayer()
+          )
+          (batch_norms): ModuleList(
+            (0): BatchNorm1d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+          )
+        )
+        (node_feature_projection): Linear(in_features=1, out_features=32, bias=True)
+      )
+      (temporal_encoder): CombinedLeTE(
+        (w1_fourier): Linear(in_features=1, out_features=32, bias=True)
+        (w1_spline): Linear(in_features=1, out_features=32, bias=True)
+        (w2_fourier): FourierSeries()
+        (w2_spline): Spline()
+        (layernorm): LayerNorm((64,), eps=1e-05, elementwise_affine=True)
+      )
+      (fusion_layer): STAMPEDE_FusionLayer(
+        (spatial_input_mlp): Sequential(
+          (0): Linear(in_features=64, out_features=64, bias=True)
+          (1): ReLU()
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Linear(in_features=64, out_features=64, bias=True)
+        )
+        (temporal_input_mlp): Sequential(
+          (0): Linear(in_features=64, out_features=64, bias=True)
+          (1): ReLU()
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Linear(in_features=64, out_features=64, bias=True)
+        )
+        (mpn): MetricParameterizationNetwork(
+          (net): Sequential(
+            (0): Linear(in_features=128, out_features=2112, bias=True)
+            (1): ReLU()
+            (2): Dropout(p=0.1, inplace=False)
+            (3): Linear(in_features=2112, out_features=4096, bias=True)
+          )
+        )
+        (output_mlp): Sequential(
+          (0): Linear(in_features=4097, out_features=4097, bias=True)
+          (1): ReLU()
+          (2): Dropout(p=0.1, inplace=False)
+          (3): Linear(in_features=4097, out_features=172, bias=True)
+        )
+        (dropout_layer): Dropout(p=0.1, inplace=False)
+        (layer_norm): LayerNorm((172,), eps=1e-05, elementwise_affine=True)
+      )
+      (feature_projection): MergeLayer(
+        (fc1): Linear(in_features=300, out_features=172, bias=True)
+        (fc2): Linear(in_features=172, out_features=172, bias=True)
+        (act): ReLU()
+      )
+    )
+    (time_encoder): TimeEncoder(
+      (w): Linear(in_features=1, out_features=100, bias=True)
+    )
+    (temporal_conv_layers): ModuleList(
+      (0-1): 2 x MultiHeadAttention(
+        (query_projection): Linear(in_features=272, out_features=272, bias=False)
+        (key_projection): Linear(in_features=444, out_features=272, bias=False)
+        (value_projection): Linear(in_features=444, out_features=272, bias=False)
+        (layer_norm): LayerNorm((272,), eps=1e-05, elementwise_affine=True)
+        (residual_fc): Linear(in_features=272, out_features=272, bias=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+    )
+    (merge_layers): ModuleList(
+      (0-1): 2 x MergeLayer(
+        (fc1): Linear(in_features=444, out_features=172, bias=True)
+        (fc2): Linear(in_features=172, out_features=172, bias=True)
+        (act): ReLU()
+      )
+    )
+  )
+  (1): MergeLayer(
+    (fc1): Linear(in_features=344, out_features=172, bias=True)
+    (fc2): Linear(in_features=172, out_features=1, bias=True)
+    (act): ReLU()
+  )
+)
+2025-08-30 09:09:44,442 - root - INFO - model name: STAMPEDE, backbone: TGAT, #parameters: 110418420 B

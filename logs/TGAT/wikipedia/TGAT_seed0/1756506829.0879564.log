@@ -1,0 +1,33 @@
+2025-08-30 07:33:49,090 - root - INFO - ********** Run 1 starts. **********
+2025-08-30 07:33:49,091 - root - INFO - Configuration is Namespace(dataset_name='wikipedia', batch_size=200, model_name='TGAT', gpu=0, num_neighbors=20, sample_neighbor_strategy='recent', time_scaling_factor=1e-06, num_walk_heads=8, num_heads=2, num_layers=2, walk_length=1, time_gap=2000, time_feat_dim=100, position_feat_dim=172, time_window_mode='fixed_proportion', patch_size=1, channel_embedding_dim=50, max_input_sequence_length=32, learning_rate=0.0001, dropout=0.1, gamma=0.5, num_epochs=5, optimizer='Adam', weight_decay=0.0, patience=20, val_ratio=0.15, test_ratio=0.15, num_runs=1, test_interval_epochs=1, negative_sample_strategy='random', max_interaction_times=10, load_best_configs=False, fusion_method='clifford', embedding_type='all', spatial_dim=64, temporal_dim=64, output_dim=172, backbone='TGAT', device='cuda:0', seed=0, save_model_name='TGAT_seed0')
+2025-08-30 07:33:49,091 - root - INFO - Instantiating model: TGAT
+2025-08-30 07:33:49,395 - root - INFO - model -> Sequential(
+  (0): TGAT(
+    (time_encoder): TimeEncoder(
+      (w): Linear(in_features=1, out_features=100, bias=True)
+    )
+    (temporal_conv_layers): ModuleList(
+      (0-1): 2 x MultiHeadAttention(
+        (query_projection): Linear(in_features=272, out_features=272, bias=False)
+        (key_projection): Linear(in_features=444, out_features=272, bias=False)
+        (value_projection): Linear(in_features=444, out_features=272, bias=False)
+        (layer_norm): LayerNorm((272,), eps=1e-05, elementwise_affine=True)
+        (residual_fc): Linear(in_features=272, out_features=272, bias=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+    )
+    (merge_layers): ModuleList(
+      (0-1): 2 x MergeLayer(
+        (fc1): Linear(in_features=444, out_features=172, bias=True)
+        (fc2): Linear(in_features=172, out_features=172, bias=True)
+        (act): ReLU()
+      )
+    )
+  )
+  (1): MergeLayer(
+    (fc1): Linear(in_features=344, out_features=172, bias=True)
+    (fc2): Linear(in_features=172, out_features=1, bias=True)
+    (act): ReLU()
+  )
+)
+2025-08-30 07:33:49,396 - root - INFO - model name: TGAT, backbone: TGAT, #parameters: 4211780 B

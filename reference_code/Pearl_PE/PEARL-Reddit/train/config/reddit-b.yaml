@@ -1,0 +1,18 @@
+dataset: REDDIT-BINARY
+model:
+  n_out: 1
+  num_layers: 6
+  num_layers_pe: 8
+  hidden_size_3d: 64
+  hidden_size: 128
+  pool: add
+train:
+  epochs: 330
+  runs: 10
+  batch_size: 128
+num_samples: 30
+test_samples: 200
+runs: 1-11
+wandb: True
+run_name: BIN70
+project_name: Reddit-BINARY

@@ -1,0 +1,3 @@
+[submodule "relbench"]
+	path = relbench
+	url = https://github.com/ehejin/PeRelbench.git

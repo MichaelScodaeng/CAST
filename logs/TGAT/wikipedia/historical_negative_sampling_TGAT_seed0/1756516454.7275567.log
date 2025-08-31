@@ -1,0 +1,65 @@
+2025-08-30 10:14:14,730 - root - INFO - ********** Run 1 starts. **********
+2025-08-30 10:14:14,730 - root - INFO - configuration is Namespace(dataset_name='wikipedia', batch_size=200, model_name='TGAT', gpu=0, num_neighbors=20, sample_neighbor_strategy='recent', time_scaling_factor=1e-06, num_walk_heads=8, num_heads=2, num_layers=2, walk_length=1, time_gap=2000, time_feat_dim=100, position_feat_dim=172, time_window_mode='fixed_proportion', patch_size=1, channel_embedding_dim=50, max_input_sequence_length=32, learning_rate=0.0001, dropout=0.1, gamma=0.5, num_epochs=100, optimizer='Adam', weight_decay=0.0, patience=20, val_ratio=0.15, test_ratio=0.15, num_runs=1, test_interval_epochs=1, negative_sample_strategy='historical', max_interaction_times=10, load_best_configs=False, fusion_method='clifford', embedding_type='all', spatial_dim=32, temporal_dim=32, output_dim=64, backbone='TGAT', device='cuda:0', seed=0, load_model_name='TGAT_seed0', save_result_name='historical_negative_sampling_TGAT_seed0')
+2025-08-30 10:14:14,988 - root - INFO - model -> Sequential(
+  (0): TGAT(
+    (time_encoder): TimeEncoder(
+      (w): Linear(in_features=1, out_features=100, bias=True)
+    )
+    (temporal_conv_layers): ModuleList(
+      (0-1): 2 x MultiHeadAttention(
+        (query_projection): Linear(in_features=272, out_features=272, bias=False)
+        (key_projection): Linear(in_features=444, out_features=272, bias=False)
+        (value_projection): Linear(in_features=444, out_features=272, bias=False)
+        (layer_norm): LayerNorm((272,), eps=1e-05, elementwise_affine=True)
+        (residual_fc): Linear(in_features=272, out_features=272, bias=True)
+        (dropout): Dropout(p=0.1, inplace=False)
+      )
+    )
+    (merge_layers): ModuleList(
+      (0-1): 2 x MergeLayer(
+        (fc1): Linear(in_features=444, out_features=172, bias=True)
+        (fc2): Linear(in_features=172, out_features=172, bias=True)
+        (act): ReLU()
+      )
+    )
+  )
+  (1): MergeLayer(
+    (fc1): Linear(in_features=344, out_features=172, bias=True)
+    (fc2): Linear(in_features=172, out_features=1, bias=True)
+    (act): ReLU()
+  )
+)
+2025-08-30 10:14:14,988 - root - INFO - model name: TGAT, #parameters: 4211780 B, 4113.06640625 KB, 4.016666412353516 MB.
+2025-08-30 10:14:14,988 - root - INFO - load model ./saved_models/TGAT/wikipedia/TGAT_seed0/TGAT_seed0.pkl
+2025-08-30 10:14:15,007 - root - INFO - get final performance on dataset wikipedia...
+2025-08-30 10:15:07,454 - root - INFO - validate loss: 0.5914
+2025-08-30 10:15:07,455 - root - INFO - validate average_precision, 0.8590
+2025-08-30 10:15:07,455 - root - INFO - validate roc_auc, 0.8036
+2025-08-30 10:15:07,456 - root - INFO - new node validate loss: 0.6103
+2025-08-30 10:15:07,456 - root - INFO - new node validate average_precision, 0.8635
+2025-08-30 10:15:07,456 - root - INFO - new node validate roc_auc, 0.8088
+2025-08-30 10:15:07,456 - root - INFO - test loss: 0.6050
+2025-08-30 10:15:07,456 - root - INFO - test average_precision, 0.8422
+2025-08-30 10:15:07,456 - root - INFO - test roc_auc, 0.7853
+2025-08-30 10:15:07,456 - root - INFO - new node test loss: 0.6271
+2025-08-30 10:15:07,456 - root - INFO - new node test average_precision, 0.8372
+2025-08-30 10:15:07,456 - root - INFO - new node test roc_auc, 0.7807
+2025-08-30 10:15:07,456 - root - INFO - Run 1 cost 52.73 seconds.
+2025-08-30 10:15:07,462 - root - INFO - save negative sampling results at ./saved_results/TGAT/wikipedia/historical_negative_sampling_TGAT_seed0.json
+2025-08-30 10:15:07,462 - root - INFO - metrics over 1 runs:
+2025-08-30 10:15:07,462 - root - INFO - validate average_precision, [np.float64(0.8590381883373637)]
+2025-08-30 10:15:07,462 - root - INFO - average validate average_precision, 0.8590 ± nan
+2025-08-30 10:15:07,462 - root - INFO - validate roc_auc, [np.float64(0.803645384820595)]
+2025-08-30 10:15:07,462 - root - INFO - average validate roc_auc, 0.8036 ± nan
+2025-08-30 10:15:07,462 - root - INFO - new node validate average_precision, [np.float64(0.8635094978851628)]
+2025-08-30 10:15:07,462 - root - INFO - average new node validate average_precision, 0.8635 ± nan
+2025-08-30 10:15:07,463 - root - INFO - new node validate roc_auc, [np.float64(0.808821106557377)]
+2025-08-30 10:15:07,463 - root - INFO - average new node validate roc_auc, 0.8088 ± nan
+2025-08-30 10:15:07,463 - root - INFO - test average_precision, [np.float64(0.8421695620177131)]
+2025-08-30 10:15:07,463 - root - INFO - average test average_precision, 0.8422 ± nan
+2025-08-30 10:15:07,463 - root - INFO - test roc_auc, [np.float64(0.7853192398387928)]
+2025-08-30 10:15:07,463 - root - INFO - average test roc_auc, 0.7853 ± nan
+2025-08-30 10:15:07,463 - root - INFO - new node test average_precision, [np.float64(0.8371582037179134)]
+2025-08-30 10:15:07,463 - root - INFO - average new node test average_precision, 0.8372 ± nan
+2025-08-30 10:15:07,463 - root - INFO - new node test roc_auc, [np.float64(0.7807350229085898)]
+2025-08-30 10:15:07,463 - root - INFO - average new node test roc_auc, 0.7807 ± nan
